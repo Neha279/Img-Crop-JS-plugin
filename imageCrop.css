@@ -1,0 +1,27 @@
+
+.main{
+
+    width:400px;
+    margin: 0 auto;
+    overflow:hidden;
+    position: relative;
+    height: 400px;
+    border:1px solid red;
+}
+
+.select {  
+    z-index:10; width:200px ; 
+    height : 200px; 
+    border : 2px solid green; 
+    position:absolute; 
+    right:0;
+    bottom:0;
+} 
+
+.absolute{
+    
+    display: block;
+    overflow: hidden;
+    position:absolute;
+    
+}
