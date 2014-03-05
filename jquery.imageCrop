@@ -1,0 +1,93 @@
+/*
+*       Developed by Neha kh
+*       ©2014 
+*       Version 1.0
+*       Testing: Firefox, Chrome [Windows 7]
+*       OPTIONS LISTING:
+			onCrop  - Callback metod at crop event. pass the paramter of croped left and top point. function (left, top)
+			
+*       All options have default values, and as such, are optional.  Check the 'defaults' JSON object below to see the defaults.
+*/
+
+(function($) {
+
+    var imageCrop = {};
+	
+	var defaults = {
+	  
+	  //callback method
+     onCrop : null	  
+	};
+	
+	$.fn.imageCrop = function(options){
+	   var el = this;
+	   var cropobject = {};
+	   cropobject.options =  $.extend({}, defaults, options);
+	   		
+		function init() {		
+			//if(cropobject.wrap == null  || cropobject.wrap == 'undefined')
+				drawsetup();   
+			cropobject.wrap =  $(".main");
+			cropobject.select = $(".select");			
+			cropobject.wrapwd =   parseCss(cropobject.wrap,'width') ;  
+			cropobject.wrapht =  parseCss(cropobject.wrap, 'height');
+			cropobject.selectwd  = parseCss(cropobject.select,'width');
+			cropobject.selectht = parseCss( cropobject.select,'height');
+		
+			cropobject.select.css('left', (cropobject.wrapwd/2)+'px');
+			cropobject.select.css('top', (cropobject.wrapht/2)+'px');
+         }
+		init();
+		 
+		function drawsetup () {
+			   el.wrap( "<div class='main'> <div class='select' > </div> </div>" );
+			   el.addClass("absolute");		
+		 }
+		function parseCss(element,attr)
+		{
+		   return parseInt( element.css(attr).replace(/[^-\d\.]/g, ''));
+		}
+		
+		function getEvent(ev)
+		{
+			if (!ev) ev = window.event;
+			var touches = (ev.changedTouches != undefined)? ev.changedTouches: undefined ;
+			var  node = (touches != undefined )? touches[0].target: ((ev.target) ? ev.target : ev.srcElement);
+			var  shoot = (ev.changedTouches != undefined)? touches[0] : ev; 
+			return shoot;
+		}
+		
+		cropobject.wrap.on("touchmove mousemove",function(ev) 
+		{       
+			   var shoot = getEvent(ev);			   
+			   var x = shoot.pageX - this.offsetLeft;
+			   var y = shoot.pageY - this.offsetTop;    
+			   if (x >= cropobject.wrapwd || (x+cropobject.selectwd) >= cropobject.wrapwd)
+				   x = parseCss(cropobject.select, 'left'); 
+			   if(y >=cropobject.wrapht || (y+cropobject.selectht) >= cropobject.wrapht) 
+				  y = parseCss(cropobject.select, 'top');    			
+			   cropobject.select.css({'top' : y ,'left' : x});    
+		});
+		
+		cropobject.wrap.on("click" , function (ev) {
+				cropobject.select.unbind("mousemove mouseup mousedown");
+				cropobject.select.unbind("touchmove touchstart touchend");
+				cropobject.wrap.unbind("touchmove mousemove");
+				cropobject.select.hide();				
+			    var xl = parseCss(cropobject.select, 'left'); 
+			    var yt = parseCss(cropobject.select, 'top'); 
+				el.css({"left" : "-" + xl + "px" ,"top" : "-" + yt + "px"});	
+                //console.log("xl " + xl  + " yt "+ yt );				
+			    if (cropobject.selectwd !== undefined) {
+					cropobject.wrap.css({ "width" :  cropobject.selectwd  + "px"  , "height" : cropobject.selectht + "px"});
+					 }
+					 
+				//callback method	 
+				if(	cropobject.options.onCrop)
+					cropobject.options.onCrop(xl, yt);
+        
+		    });  
+	}
+
+
+})(jQuery);
